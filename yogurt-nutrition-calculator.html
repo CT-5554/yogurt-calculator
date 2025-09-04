@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>冷萃酸奶营养计算器 v2.1</title>
+  <style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          padding: 20px;
+      }
+
+      .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 15px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+          overflow: hidden;
+      }
+
+      .header {
+          background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+          color: white;
+          padding: 30px;
+          text-align: center;
+      }
+
+      .header h1 {
+          font-size: 2.5em;
+          margin-bottom: 10px;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .header p {
+          font-size: 1.1em;
+          opacity: 0.9;
+      }
+
+      .main-content {
+          display: grid;
+          grid-template-columns: 1fr 1.5fr;
+          gap: 30px;
+          padding: 30px;
+      }
+
+      .input-panel {
+          background: #f8f9fa;
+          padding: 25px;
+          border-radius: 10px;
+          border: 1px solid #e9ecef;
+      }
+
+      .result-panel {
+          background: #fff;
+          padding: 25px;
+          border-radius: 10px;
+          border: 1px solid #e9ecef;
+      }
+
+      .section {
+          margin-bottom: 25px;
+      }
+
+      .section h3 {
+          color: #333;
+          margin-bottom: 15px;
+          padding-bottom: 8px;
+          border-bottom: 2px solid #4CAF50;
+          font-size: 1.2em;
+      }
+
+      .input-group {
+          margin-bottom: 15px;
+      }
+
+      .input-group label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: 600;
+          color: #555;
+      }
+
+      .input-group input, .input-group select {
+          width: 100%;
+          padding: 12px;
+          border: 2px solid #ddd;
+          border-radius: 8px;
+          font-size: 16px;
+          transition: border-color 0.3s ease;
+      }
+
+      .input-group input:focus, .input-group select:focus {
+          outline: none;
+          border-color: #4CAF50;
+          box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+      }
+
+      .input-group input::placeholder {
+          color: #999;
+      }
+
+      .calculated-info {
+          background: #e8f5e8;
+          border: 2px solid #4CAF50;
+          border-radius: 8px;
+          padding: 15px;
+          margin-top: 10px;
+      }
+
+      .calculated-info h4 {
+          color: #2e7d32;
+          margin-bottom: 8px;
+          font-size: 1.1em;
+      }
+
+      .calculated-info .nutrient-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 5px 0;
+          border-bottom: 1px solid #c8e6c9;
+      }
+
+      .calculated-info .nutrient-item:last-child {
+          border-bottom: none;
+      }
+
+      .calculated-info .nutrient-label {
+          font-weight: 500;
+          color: #2e7d32;
+      }
+
+      .calculated-info .nutrient-value {
+          font-weight: 600;
+          color: #1b5e20;
+          font-size: 1.1em;
+      }
+
+      .button-group {
+          display: flex;
+          gap: 10px;
+          margin-top: 20px;
+      }
+
+      .btn {
+          flex: 1;
+          padding: 12px 20px;
+          border: none;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+      }
+
+      .btn-primary {
+          background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+          color: white;
+      }
+
+      .btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+      }
+
+      .btn-secondary {
+          background: #6c757d;
+          color: white;
+      }
+
+      .btn-secondary:hover {
+          background: #5a6268;
+          transform: translateY(-2px);
+      }
+
+      .btn-export {
+          background: #17a2b8;
+          color: white;
+      }
+
+      .btn-export:hover {
+          background: #138496;
+          transform: translateY(-2px);
+      }
+
+      .result-display {
+          background: #f8f9fa;
+          border: 1px solid #e9ecef;
+          border-radius: 8px;
+          padding: 20px;
+          min-height: 400px;
+          font-family: 'Courier New', monospace;
+          font-size: 14px;
+          line-height: 1.6;
+          white-space: pre-wrap;
+          overflow-y: auto;
+      }
+
+      .placeholder-text {
+          color: #6c757d;
+          font-style: italic;
+          text-align: center;
+          padding-top: 50px;
+      }
+
+      .error {
+          background: #f8d7da;
+          color: #721c24;
+          padding: 10px;
+          border-radius: 5px;
+          margin: 10px 0;
+          border: 1px solid #f5c6cb;
+      }
+
+      .success {
+          background: #d4edda;
+          color: #155724;
+          padding: 10px;
+          border-radius: 5px;
+          margin: 10px 0;
+          border: 1px solid #c3e6cb;
+      }
+
+      .model-info {
+          background: #e3f2fd;
+          padding: 15px;
+          border-radius: 8px;
+          margin-top: 10px;
+          border-left: 4px solid #2196F3;
+      }
+
+      .model-info h4 {
+          color: #1976D2;
+          margin-bottom: 8px;
+      }
+
+      .model-info p {
+          color: #424242;
+          font-size: 0.9em;
+          line-height: 1.4;
+      }
+
+      .weight-input-group {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+      }
+
+      .serving-info {
+          background: #fff3cd;
+          border: 1px solid #ffeaa7;
+          border-radius: 8px;
+          padding: 12px;
+          margin-top: 10px;
+      }
+
+      .serving-info .serving-label {
+          font-size: 0.9em;
+          color: #856404;
+          font-weight: 500;
+      }
+
+      @media (max-width: 768px) {
+          .main-content {
+              grid-template-columns: 1fr;
+              gap: 20px;
+              padding: 20px;
+          }
+          
+          .header h1 {
+              font-size: 2em;
+          }
+          
+          .button-group {
+              flex-direction: column;
+          }
+
+          .weight-input-group {
+              grid-template-columns: 1fr;
+          }
+      }
+
+      .loading {
+          display: none;
+          text-align: center;
+          padding: 20px;
+      }
+
+      .spinner {
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #4CAF50;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 10px;
+      }
+
+      @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+      }
+  </style>
+</head>
+<body>
+  <div class="container">
+      <div class="header">
+          <h1>🥛 冷萃酸奶营养计算器</h1>
+          <p>根据营养标签计算纱布过滤制作的冷萃酸奶营养成分和热量</p>
+      </div>
+
+      <div class="main-content">
+          <!-- 输入面板 -->
+          <div class="input-panel">
+              <div class="section">
+                  <h3>🥛 酸奶重量信息</h3>
+                  <div class="weight-input-group">
+                      <div class="input-group">
+                          <label for="servingSize">每份重量 (g)</label>
+                          <input type="number" id="servingSize" placeholder="通常是100" step="1" min="1" value="100">
+                      </div>
+                      <div class="input-group">
+                          <label for="totalWeight">总重量 (g)</label>
+                          <input type="number" id="totalWeight" placeholder="例如: 500" step="0.1" min="0">
+                      </div>
+                  </div>
+                  <div class="serving-info">
+                      <div class="serving-label">💡 提示：每份重量通常标注在营养标签上，一般为100g</div>
+                  </div>
+              </div>
+
+              <div class="section">
+                  <h3>📊 每份营养素含量</h3>
+                  <div class="input-group">
+                      <label for="proteinPerServing">蛋白质 (g/份)</label>
+                      <input type="number" id="proteinPerServing" placeholder="例如: 3.1" step="0.1" min="0">
+                  </div>
+                  <div class="input-group">
+                      <label for="fatPerServing">脂肪 (g/份)</label>
+                      <input type="number" id="fatPerServing" placeholder="例如: 1.6" step="0.1" min="0">
+                  </div>
+                  <div class="input-group">
+                      <label for="carbPerServing">碳水化合物 (g/份)</label>
+                      <input type="number" id="carbPerServing" placeholder="例如: 2.5" step="0.1" min="0">
+                  </div>
+                  
+                  <!-- 自动计算的总营养素显示 -->
+                  <div class="calculated-info" id="totalNutrientsInfo" style="display: none;">
+                      <h4>📋 计算得出的总营养素含量：</h4>
+                      <div class="nutrient-item">
+                          <span class="nutrient-label">蛋白质总量：</span>
+                          <span class="nutrient-value" id="totalProtein">0.0 g</span>
+                      </div>
+                      <div class="nutrient-item">
+                          <span class="nutrient-label">脂肪总量：</span>
+                          <span class="nutrient-value" id="totalFat">0.0 g</span>
+                      </div>
+                      <div class="nutrient-item">
+                          <span class="nutrient-label">碳水化合物总量：</span>
+                          <span class="nutrient-value" id="totalCarb">0.0 g</span>
+                      </div>
+                      <div class="nutrient-item">
+                          <span class="nutrient-label">总份数：</span>
+                          <span class="nutrient-value" id="totalServings">0.0 份</span>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="section">
+                  <h3>💧 过滤信息</h3>
+                  <div class="input-group">
+                      <label for="wheyWeight">乳清重量 (g)</label>
+                      <input type="number" id="wheyWeight" placeholder="例如: 150" step="0.1" min="0">
+                  </div>
+              </div>
+
+              <div class="section">
+                  <h3>⚙️ 计算模型</h3>
+                  <div class="input-group">
+                      <select id="calculationModel">
+                          <option value="realistic">现实模型 (考虑营养素流失)</option>
+                          <option value="proportional">比例分布模型 (理想状态)</option>
+                      </select>
+                  </div>
+                  <div class="model-info" id="modelInfo">
+                      <h4>现实模型</h4>
+                      <p>考虑过滤过程中营养素的实际流失情况，蛋白质流失5%，脂肪流失2%，碳水化合物流失15%。计算结果更接近实际情况。</p>
+                  </div>
+              </div>
+
+              <div class="button-group">
+                  <button class="btn btn-primary" onclick="calculateNutrients()">🔍 开始计算</button>
+                  <button class="btn btn-secondary" onclick="clearInputs()">🗑️ 清空输入</button>
+                  <button class="btn btn-export" onclick="exportResults()">💾 导出结果</button>
+              </div>
+          </div>
+
+          <!-- 结果面板 -->
+          <div class="result-panel">
+              <div class="section">
+                  <h3>📋 计算结果</h3>
+                  <div class="loading" id="loading">
+                      <div class="spinner"></div>
+                      <p>正在计算中...</p>
+                  </div>
+                  <div class="result-display" id="resultDisplay">
+                      <div class="placeholder-text">
+                          计算结果将在这里显示...<br><br>
+                          请在左侧输入数据后点击"开始计算"按钮。<br><br>
+                          💡 使用提示：<br>
+                          • 每份重量：查看营养标签上的"每份"或"每100g"<br>
+                          • 营养素含量：直接输入标签上对应的数值<br>
+                          • 总重量：你购买的酸奶总重量<br>
+                          • 乳清重量：过滤后分离出的乳清重量
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <script>
+      // 营养计算器类
+      class YogurtCalculator {
+          constructor() {
+              this.proteinCaloriesPerGram = 4;
+              this.fatCaloriesPerGram = 9;
+              this.carbohydrateCaloriesPerGram = 4;
+          }
+
+          // 计算总营养素含量
+          calculateTotalNutrients(servingSize, totalWeight, nutrientsPerServing) {
+              const totalServings = totalWeight / servingSize;
+              
+              return {
+                  totalServings: totalServings,
+                  protein: nutrientsPerServing.protein * totalServings,
+                  fat: nutrientsPerServing.fat * totalServings,
+                  carbohydrate: nutrientsPerServing.carbohydrate * totalServings
+              };
+          }
+
+          calculate(inputData, useRealisticModel = true) {
+              // 验证输入数据
+              this.validateInput(inputData);
+
+              // 计算冷萃酸奶重量
+              const concentratedWeight = inputData.totalWeight - inputData.wheyWeight;
+              const concentrationRatio = inputData.totalWeight / concentratedWeight;
+
+              // 计算营养素含量
+              let concentratedNutrients;
+              if (useRealisticModel) {
+                  concentratedNutrients = this.calculateRealisticNutrients(inputData.totalNutrients, concentratedWeight);
+              } else {
+                  concentratedNutrients = this.calculateProportionalNutrients(inputData.totalNutrients, concentrationRatio);
+              }
+
+              // 计算热量
+              const totalCalories = this.calculateCalories(concentratedNutrients);
+              const caloriesPer100g = (totalCalories / concentratedWeight) * 100;
+
+              return {
+                  concentratedWeight,
+                  concentrationRatio,
+                  concentratedNutrients,
+                  totalCalories,
+                  caloriesPer100g,
+                  totalServings: inputData.totalNutrients.totalServings
+              };
+          }
+
+          validateInput(data) {
+              if (data.servingSize <= 0) {
+                  throw new Error("每份重量必须大于0");
+              }
+              if (data.totalWeight <= 0) {
+                  throw new Error("总重量必须大于0");
+              }
+              if (data.wheyWeight <= 0) {
+                  throw new Error("乳清重量必须大于0");
+              }
+              if (data.wheyWeight >= data.totalWeight) {
+                  throw new Error("乳清重量不能大于等于总重量");
+              }
+              if (data.nutrientsPerServing.protein < 0 || data.nutrientsPerServing.fat < 0 || data.nutrientsPerServing.carbohydrate < 0) {
+                  throw new Error("营养素含量不能为负数");
+              }
+          }
+
+          calculateRealisticNutrients(totalNutrients, concentratedWeight) {
+              // 现实模型：考虑营养素流失
+              const proteinLossRate = 0.05; // 蛋白质流失5%
+              const fatLossRate = 0.02;     // 脂肪流失2%
+              const carbLossRate = 0.15;    // 碳水化合物流失15%
+
+              const retainedProtein = totalNutrients.protein * (1 - proteinLossRate);
+              const retainedFat = totalNutrients.fat * (1 - fatLossRate);
+              const retainedCarb = totalNutrients.carbohydrate * (1 - carbLossRate);
+
+              return {
+                  protein: retainedProtein,
+                  fat: retainedFat,
+                  carbohydrate: retainedCarb
+              };
+          }
+
+          calculateProportionalNutrients(totalNutrients, concentrationRatio) {
+              // 比例分布模型：理想状态，营养素完全保留
+              return {
+                  protein: totalNutrients.protein,
+                  fat: totalNutrients.fat,
+                  carbohydrate: totalNutrients.carbohydrate
+              };
+          }
+
+          calculateCalories(nutrients) {
+              return (nutrients.protein * this.proteinCaloriesPerGram) +
+                     (nutrients.fat * this.fatCaloriesPerGram) +
+                     (nutrients.carbohydrate * this.carbohydrateCaloriesPerGram);
+          }
+      }
+
+      // 全局变量
+      const calculator = new YogurtCalculator();
+      let lastResult = null;
+
+      // 实时计算总营养素含量
+      function updateTotalNutrients() {
+          const servingSize = parseFloat(document.getElementById('servingSize').value) || 0;
+          const totalWeight = parseFloat(document.getElementById('totalWeight').value) || 0;
+          const proteinPerServing = parseFloat(document.getElementById('proteinPerServing').value) || 0;
+          const fatPerServing = parseFloat(document.getElementById('fatPerServing').value) || 0;
+          const carbPerServing = parseFloat(document.getElementById('carbPerServing').value) || 0;
+
+          const totalNutrientsInfo = document.getElementById('totalNutrientsInfo');
+          
+          if (servingSize > 0 && totalWeight > 0 && (proteinPerServing > 0 || fatPerServing > 0 || carbPerServing > 0)) {
+              const totalServings = totalWeight / servingSize;
+              const totalProtein = proteinPerServing * totalServings;
+              const totalFat = fatPerServing * totalServings;
+              const totalCarb = carbPerServing * totalServings;
+
+              document.getElementById('totalServings').textContent = totalServings.toFixed(1) + ' 份';
+              document.getElementById('totalProtein').textContent = totalProtein.toFixed(1) + ' g';
+              document.getElementById('totalFat').textContent = totalFat.toFixed(1) + ' g';
+              document.getElementById('totalCarb').textContent = totalCarb.toFixed(1) + ' g';
+              
+              totalNutrientsInfo.style.display = 'block';
+          } else {
+              totalNutrientsInfo.style.display = 'none';
+          }
+      }
+
+      // 为所有相关输入框添加事件监听器
+      document.addEventListener('DOMContentLoaded', function() {
+          const inputs = ['servingSize', 'totalWeight', 'proteinPerServing', 'fatPerServing', 'carbPerServing'];
+          inputs.forEach(id => {
+              const element = document.getElementById(id);
+              element.addEventListener('input', updateTotalNutrients);
+              element.addEventListener('keypress', function(e) {
+                  if (e.key === 'Enter') {
+                      calculateNutrients();
+                  }
+              });
+          });
+
+          // 乳清重量输入框也添加回车事件
+          document.getElementById('wheyWeight').addEventListener('keypress', function(e) {
+              if (e.key === 'Enter') {
+                  calculateNutrients();
+              }
+          });
+          
+          // 设置焦点到第一个输入框
+          document.getElementById('totalWeight').focus();
+      });
+
+      // 模型选择改变时更新说明
+      document.getElementById('calculationModel').addEventListener('change', function() {
+          const modelInfo = document.getElementById('modelInfo');
+          const isRealistic = this.value === 'realistic';
+          
+          if (isRealistic) {
+              modelInfo.innerHTML = `
+                  <h4>现实模型</h4>
+                  <p>考虑过滤过程中营养素的实际流失情况，蛋白质流失5%，脂肪流失2%，碳水化合物流失15%。计算结果更接近实际情况。</p>
+              `;
+          } else {
+              modelInfo.innerHTML = `
+                  <h4>比例分布模型</h4>
+                  <p>假设营养素在过滤过程中不会流失，完全保留在冷萃酸奶中。这是理想化的计算模型，实际情况可能有所不同。</p>
+              `;
+          }
+      });
+
+      // 输入验证
+      function validateInputs() {
+          const servingSize = parseFloat(document.getElementById('servingSize').value);
+          const totalWeight = parseFloat(document.getElementById('totalWeight').value);
+          const proteinPerServing = parseFloat(document.getElementById('proteinPerServing').value);
+          const fatPerServing = parseFloat(document.getElementById('fatPerServing').value);
+          const carbPerServing = parseFloat(document.getElementById('carbPerServing').value);
+          const wheyWeight = parseFloat(document.getElementById('wheyWeight').value);
+
+          const errors = [];
+
+          if (isNaN(servingSize) || servingSize <= 0) {
+              errors.push("请输入有效的每份重量（大于0）");
+          }
+
+          if (isNaN(totalWeight) || totalWeight <= 0) {
+              errors.push("请输入有效的总重量（大于0）");
+          }
+
+          if (isNaN(proteinPerServing) || proteinPerServing < 0) {
+              errors.push("请输入有效的每份蛋白质含量（大于等于0）");
+          }
+
+          if (isNaN(fatPerServing) || fatPerServing < 0) {
+              errors.push("请输入有效的每份脂肪含量（大于等于0）");
+          }
+
+          if (isNaN(carbPerServing) || carbPerServing < 0) {
+              errors.push("请输入有效的每份碳水化合物含量（大于等于0）");
+          }
+
+          if (isNaN(wheyWeight) || wheyWeight <= 0) {
+              errors.push("请输入有效的乳清重量（大于0）");
+          }
+
+          if (!isNaN(totalWeight) && !isNaN(wheyWeight) && wheyWeight >= totalWeight) {
+              errors.push("乳清重量不能大于等于总重量");
+          }
+
+          return errors;
+      }
+
+      // 显示错误信息
+      function showError(message) {
+          const resultDisplay = document.getElementById('resultDisplay');
+          resultDisplay.innerHTML = `<div class="error">❌ 输入错误<br><br>${message}</div>`;
+      }
+
+      // 显示成功信息
+      function showSuccess(message) {
+          const resultDisplay = document.getElementById('resultDisplay');
+          resultDisplay.innerHTML = `<div class="success">✅ ${message}</div>`;
+      }
+
+      // 计算营养素
+      function calculateNutrients() {
+          // 验证输入
+          const errors = validateInputs();
+          if (errors.length > 0) {
+              showError(errors.join('<br>• '));
+              return;
+          }
+
+          // 显示加载状态
+          const loading = document.getElementById('loading');
+          const resultDisplay = document.getElementById('resultDisplay');
+          loading.style.display = 'block';
+          resultDisplay.innerHTML = '';
+
+          // 模拟计算延迟（增加用户体验）
+          setTimeout(() => {
+              try {
+                  // 获取输入数据
+                  const servingSize = parseFloat(document.getElementById('servingSize').value);
+                  const totalWeight = parseFloat(document.getElementById('totalWeight').value);
+                  const nutrientsPerServing = {
+                      protein: parseFloat(document.getElementById('proteinPerServing').value),
+                      fat: parseFloat(document.getElementById('fatPerServing').value),
+                      carbohydrate: parseFloat(document.getElementById('carbPerServing').value)
+                  };
+                  const wheyWeight = parseFloat(document.getElementById('wheyWeight').value);
+
+                  // 计算总营养素含量
+                  const totalNutrients = calculator.calculateTotalNutrients(servingSize, totalWeight, nutrientsPerServing);
+
+                  const inputData = {
+                      servingSize,
+                      totalWeight,
+                      nutrientsPerServing,
+                      totalNutrients,
+                      wheyWeight
+                  };
+
+                  const useRealisticModel = document.getElementById('calculationModel').value === 'realistic';
+
+                  // 执行计算
+                  const result = calculator.calculate(inputData, useRealisticModel);
+                  lastResult = { inputData, result, useRealisticModel };
+
+                  // 显示结果
+                  displayResults(inputData, result, useRealisticModel);
+
+              } catch (error) {
+                  showError(error.message);
+              } finally {
+                  loading.style.display = 'none';
+              }
+          }, 500);
+      }
+
+      // 显示计算结果
+      // 显示计算结果
+function displayResults(inputData, result, useRealisticModel) {
+    const resultDisplay = document.getElementById('resultDisplay');
+    
+    let output = `═══════════════════════════════════════════════════════════
+                    冷萃酸奶营养计算结果
+═══════════════════════════════════════════════════════════
+
+📋 输入信息摘要：
+────────────────────────────────────────────────────────────
+每份重量：${inputData.servingSize.toFixed(0)} g
+总重量：${inputData.totalWeight.toFixed(1)} g
+总份数：${inputData.totalNutrients.totalServings.toFixed(1)} 份
+过滤乳清重量：${inputData.wheyWeight.toFixed(1)} g
+计算模型：${useRealisticModel ? '现实模型' : '比例分布模型'}
+
+📊 每份营养素含量（来自标签）：
+────────────────────────────────────────────────────────────
+蛋白质：${inputData.nutrientsPerServing.protein.toFixed(1)} g/份
+脂肪：${inputData.nutrientsPerServing.fat.toFixed(1)} g/份
+碳水化合物：${inputData.nutrientsPerServing.carbohydrate.toFixed(1)} g/份
+
+📈 计算得出的总营养素含量：
+────────────────────────────────────────────────────────────
+蛋白质总量：${inputData.totalNutrients.protein.toFixed(1)} g
+脂肪总量：${inputData.totalNutrients.fat.toFixed(1)} g
+碳水化合物总量：${inputData.totalNutrients.carbohydrate.toFixed(1)} g
+
+🥛 冷萃酸奶最终结果：
+────────────────────────────────────────────────────────────
+冷萃酸奶重量：${result.concentratedWeight.toFixed(1)} g
+浓缩倍数：${result.concentrationRatio.toFixed(2)} 倍
+
+🔬 冷萃酸奶营养素含量：
+────────────────────────────────────────────────────────────
+蛋白质：${result.concentratedNutrients.protein.toFixed(1)} g
+脂肪：${result.concentratedNutrients.fat.toFixed(1)} g
+碳水化合物：${result.concentratedNutrients.carbohydrate.toFixed(1)} g
+
+🔥 热量信息：
+────────────────────────────────────────────────────────────
+总热量：${result.totalCalories.toFixed(1)} kcal
+每100g热量：${result.caloriesPer100g.toFixed(1)} kcal/100g
+
+📊 每100g营养素含量：
+────────────────────────────────────────────────────────────
+蛋白质：${(result.concentratedNutrients.protein / result.concentratedWeight * 100).toFixed(1)} g/100g
+脂肪：${(result.concentratedNutrients.fat / result.concentratedWeight * 100).toFixed(1)} g/100g
+碳水化合物：${(result.concentratedNutrients.carbohydrate / result.concentratedWeight * 100).toFixed(1)} g/100g
+
+💡 营养素流失情况（仅现实模型）：
+────────────────────────────────────────────────────────────`;
+
+    if (useRealisticModel) {
+        const proteinLoss = inputData.totalNutrients.protein * 0.05;
+        const fatLoss = inputData.totalNutrients.fat * 0.02;
+        const carbLoss = inputData.totalNutrients.carbohydrate * 0.15;
+        
+        output += `
+蛋白质流失：${proteinLoss.toFixed(1)} g (5%)
+脂肪流失：${fatLoss.toFixed(1)} g (2%)
+碳水化合物流失：${carbLoss.toFixed(1)} g (15%)`;
+    } else {
+        output += `
+使用比例分布模型，假设营养素无流失`;
+    }
+
+    output += `
+
+📝 计算说明：
+────────────────────────────────────────────────────────────
+1. 总营养素 = 每份营养素 × 总份数
+2. 冷萃酸奶重量 = 总重量 - 乳清重量
+3. 浓缩倍数 = 总重量 ÷ 冷萃酸奶重量
+4. 现实模型考虑营养素在过滤过程中的流失
+5. 热量计算：蛋白质4kcal/g，脂肪9kcal/g，碳水4kcal/g
+
+⏰ 计算时间：${new Date().toLocaleString('zh-CN')}`;
+
+    resultDisplay.textContent = output;
+}
+
+
+      // 导出结果
+      function exportResults() {
+          if (!lastResult) {
+              showError('没有计算结果可以导出，请先进行计算');
+              return;
+          }
+
+          const resultText = document.getElementById('resultDisplay').textContent;
+          const blob = new Blob([resultText], { type: 'text/plain;charset=utf-8' });
+          const url = window.URL.createObjectURL(blob);
+          
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `冷萃酸奶计算结果_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.txt`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          
+          showSuccess('计算结果已导出到文件');
+      }
+
+      // 回车键快捷计算
+      document.addEventListener('DOMContentLoaded', function() {
+          const inputs = document.querySelectorAll('input[type="number"]');
+          inputs.forEach(input => {
+              input.addEventListener('keypress', function(e) {
+                  if (e.key === 'Enter') {
+                      calculateNutrients();
+                  }
+              });
+          });
+          
+          // 设置焦点到第一个输入框
+          document.getElementById('originalWeight').focus();
+      });
+
+      // 示例数据填充（用于演示）
+      function fillExampleData() {
+          document.getElementById('originalWeight').value = '500';
+          document.getElementById('protein').value = '15.5';
+          document.getElementById('fat').value = '8.2';
+          document.getElementById('carbohydrate').value = '12.3';
+          document.getElementById('wheyWeight').value = '150';
+      }
+
+      // 添加示例数据按钮（可选）
+      // fillExampleData(); // 取消注释以自动填充示例数据
+  </script>
+</body>
+</html>
