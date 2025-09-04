@@ -595,7 +595,7 @@
           if (isRealistic) {
               modelInfo.innerHTML = `
                   <h4>现实模型</h4>
-                  <p>考虑过滤过程中营养素的实际流失情况，蛋白质流失5%，脂肪流失2%，碳水化合物流失15%。计算结果更接近实际情况。</p>
+                  <p>考虑过滤过程中营养素的实际流失情况，蛋白质流失5%，脂肪流失2%，碳水化合物流失85%。计算结果更接近实际情况。</p>
               `;
           } else {
               modelInfo.innerHTML = `
@@ -772,12 +772,12 @@ function displayResults(inputData, result, useRealisticModel) {
     if (useRealisticModel) {
         const proteinLoss = inputData.totalNutrients.protein * 0.05;
         const fatLoss = inputData.totalNutrients.fat * 0.02;
-        const carbLoss = inputData.totalNutrients.carbohydrate * 0.15;
+        const carbLoss = inputData.totalNutrients.carbohydrate * 0.85;
         
         output += `
 蛋白质流失：${proteinLoss.toFixed(1)} g (5%)
 脂肪流失：${fatLoss.toFixed(1)} g (2%)
-碳水化合物流失：${carbLoss.toFixed(1)} g (15%)`;
+碳水化合物流失：${carbLoss.toFixed(1)} g (85%)`;
     } else {
         output += `
 使用比例分布模型，假设营养素无流失`;
